@@ -17,46 +17,52 @@ const db = new redis({
 
 router.all('*', async (req, res, next) => {
 
-    // destruct request parameters
-    const {originalUrl: url, body: payload, headers: {_s: signature, _t: timestamp, _n: nonce}} = req;
+    try {
 
-    // check params existence
-    if (signature === undefined || nonce === undefined || nonce === timestamp) {
-        res.sendStatus(401);
-        Logger.Error('Invalid request');
-        return;
+        // destruct request parameters
+        const {originalUrl: url, body: payload, headers: {_s: signature, _t: timestamp, _n: nonce}} = req;
+
+        // check params existence
+        if (signature === undefined || nonce === undefined || nonce === timestamp) {
+            res.sendStatus(401);
+            Logger.Error('Invalid request');
+            return;
+        }
+
+        // check timestamp
+        if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
+            res.sendStatus(401);
+            Logger.Error('Timestamp Difference Too Large');
+            return;
+        }
+
+        // check nonce
+        await db.select(redisDatabase.NONCE);
+        if (await db.exists(nonce)) {
+            res.sendStatus(401);
+            Logger.Error('Duplicate Request');
+            return;
+        }
+
+        // check signature
+        const hash = sign({url, payload, timestamp, nonce});
+        if (hash !== signature) {
+            res.sendStatus(401);
+            Logger.Error('Signature Mismatch');
+            return;
+        }
+
+        /**********************
+         * Everything is fine *
+         *********************/
+
+        await db.set(nonce, true, 'EX', nonceExpireTime);
+
+        return next();
+
+    } catch (e) {
+        Logger.Error(e);
     }
-
-    // check timestamp
-    if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
-        res.sendStatus(401);
-        Logger.Error('Timestamp Difference Too Large');
-        return;
-    }
-
-    // check nonce
-    await db.select(redisDatabase.NONCE);
-    if (await db.exists(nonce)) {
-        res.sendStatus(401);
-        Logger.Error('Duplicate Request');
-        return;
-    }
-
-    // check signature
-    const hash = sign({url, payload, timestamp, nonce});
-    if (hash !== signature) {
-        res.sendStatus(401);
-        Logger.Error('Signature Mismatch');
-        return;
-    }
-
-    /**********************
-     * Everything is fine *
-     *********************/
-
-    await db.set(nonce, true, 'EX', nonceExpireTime);
-
-    return next();
 });
 
 
@@ -64,10 +70,10 @@ router.all('*', async (req, res, next) => {
  * Handle Authentication
  */
 router.post('/', async (req, res) => {
-    const {username, password} = req.body;
 
     try {
 
+        const {username, password} = req.body;
         const authenticated = await authenticate(username, password);
 
         if (authenticated) {
