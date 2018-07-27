@@ -1,9 +1,9 @@
-const {port} = require('./config');
-const request = require('request');
 const {promisify} = require('util');
-const sign = require('./utils/sign');
+const request = require('request');
 const rp = promisify(request);
-const uuidv1 = require('uuid/v1');
+const uuid = require('uuid/v1');
+const sign = require('./utils/sign');
+const {port} = require('./config');
 
 /**
  * Just a simple client showing how to make requests
@@ -17,8 +17,6 @@ class Client {
         this.baseURL = `http://localhost:${port}`;
     }
 
-
-
     /**
      * Authentication Process
      * @returns {Promise<void>}
@@ -31,7 +29,7 @@ class Client {
         const url = `/api/auth`;
         const payload = {username, password};
         const timestamp = Date.now();
-        const nonce = uuidv1();
+        const nonce = uuid();
 
 
         const signature = sign({url, payload, timestamp, nonce});
@@ -69,7 +67,7 @@ class Client {
         const payload = {message};
         const token = this.token;
         const timestamp = Date.now();
-        const nonce = uuidv1();
+        const nonce = uuid();
 
         const signature = sign({url, payload, token, timestamp, nonce, secret: this.secret});
 

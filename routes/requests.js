@@ -4,7 +4,7 @@ const redis = require("ioredis");
 const SERVICE_NAME = 'auth.js';
 const Logger = require('../utils/logger')(SERVICE_NAME);
 const sign = require('../utils/sign');
-const {redisHost, redisPort, redisDatabase} = require('../config');
+const {redisHost, redisPort, redisDatabase, tokenExpireTime, nonceExpireTime} = require('../config');
 
 const db = new redis({
     host: redisHost,
@@ -25,7 +25,7 @@ router.all('*', async (req, res, next) => {
     }
 
     // check timestamp
-    if (Math.abs(Date.now() - timestamp) > 60000) {
+    if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
         res.sendStatus(401);
         Logger.Error('Timestamp Difference Too Large');
         return;
@@ -58,6 +58,17 @@ router.all('*', async (req, res, next) => {
         Logger.Error('Signature Mismatch');
         return;
     }
+
+    /**********************
+     * Everything is fine *
+     *********************/
+
+    // refresh the token expire time & add nonce
+    db.expire(token, tokenExpireTime).then(() => {
+        db.select(redisDatabase.NONCE).then(() => {
+            db.set(nonce, true, 'EX', nonceExpireTime)
+        })
+    });
 
     return next();
 });

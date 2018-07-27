@@ -7,7 +7,7 @@ const randomBytesAsync = promisify(crypto.randomBytes);
 const SERVICE_NAME = 'API.auth';
 const Logger = require('../utils/logger')(SERVICE_NAME);
 const sign = require('../utils/sign');
-const {redisHost, redisPort, redisDatabase, predefinedSecret} = require('../config');
+const {redisHost, redisPort, redisDatabase, tokenExpireTime, nonceExpireTime} = require('../config');
 
 const db = new redis({
     host: redisHost,
@@ -28,7 +28,7 @@ router.all('*', async (req, res, next) => {
     }
 
     // check timestamp
-    if (Math.abs(Date.now() - timestamp) > 60) {
+    if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
         res.sendStatus(401);
         Logger.Error('Timestamp Difference Too Large');
         return;
@@ -51,6 +51,12 @@ router.all('*', async (req, res, next) => {
         Logger.Error('Signature Mismatch');
         return;
     }
+
+    /**********************
+     * Everything is fine *
+     *********************/
+
+    db.set(nonce, true, 'EX', nonceExpireTime);
 
     return next();
 });
@@ -80,7 +86,7 @@ router.post('/', async (req, res) => {
 
             // write the relation of token and user to the cache
             await db.select(redisDatabase.TOKEN);
-            db.set(token, JSON.stringify({username, secret}));
+            db.set(token, JSON.stringify({username, secret}), 'EX', tokenExpireTime);
 
             // send the token & secret to the client
             res.json({status: 'success', token, secret});

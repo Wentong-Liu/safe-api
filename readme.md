@@ -12,7 +12,7 @@ This project is a general solution for the below scenario:
 
 * A client needs to use the provided `secret` to **sign** subsequent requests.
 
-* TODO: Secret tokens can have an **expire time** and can be **invalidated manually**.
+* `Identity tokens` can have an **expire time** and can be **invalidated manually**.
 
 * Requests need to be **protected from** *brute-force attack*, *reply attack* or *man-in-the-middle* attack.
 
