@@ -2,19 +2,19 @@
 
 This project is a general solution for the below scenario:
 
-* There are *many* clients who will be making requests over the network.
+* There are **many** clients who will be making requests over the network.
 
-* Each client has an unique *identity* that needs to be authenticated by the provided *user credential*.
+* Each client has an unique **identity** that needs to be **authenticated** by the provided *user credential*.
 
 * After authentication, the server will issue a random secure `identity token` and a random secure `secret` to the client.
 
-* A client needs to use the provided `identity token` to prove its identity.
+* A client needs to use the provided `identity token` to prove its **identity**.
 
-* A client needs to use the provided `secret` to sign subsequent requests.
+* A client needs to use the provided `secret` to **sign** subsequent requests.
 
-* Secret tokens can have an *expire time* and can be invalidated *manually*.
+* TODO: Secret tokens can have an **expire time** and can be **invalidated manually**.
 
-* Requests need to be protected from *brute-force attack*, *reply attack* or *man-in-the-middle* attack.
+* Requests need to be **protected from** *brute-force attack*, *reply attack* or *man-in-the-middle* attack.
 
 * Requests are passed over `POST` method and payloads are in `JSON` format.
 
@@ -22,12 +22,12 @@ This project is a general solution for the below scenario:
 
 * Use Redis to store identity tokens.
 
-* Use timestamp and nonce to protect from reply attack.
+* Use `timestamp` and `nonce` to protect from *reply attack*.
 
-* Use SSL to protect man-in-the-middle attack
+* Use SSL to protect _man-in-the-middle attack_
 
-* Use SHA-256 to calculate signature to prevent from brute-force.
+* Use `SHA-256` to calculate signature to prevent from _brute-force_.
 
-* Use HTTP header to pass the identity token and signature.
+* Use HTTP header to pass the identity token and signature for a better compatibility.
 
 * Use identity token instead of username to avoid disclose login credentials.
