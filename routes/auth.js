@@ -37,7 +37,7 @@ router.post('/auth', async (req, res) => {
             } while (await db.exists(token));
 
             // write the relation of token and user to the cache
-            db.set(token, {username, secret});
+            db.set(token, JSON.stringify({username, secret}));
             res.json({status: 'success', token, secret});
 
             Logger.Info(`User authenticated: ${username}`);

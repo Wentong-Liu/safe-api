@@ -10,7 +10,8 @@ const {redisHost, redisPort, redisDatabase} = require('../config');
 
 const db = new redis({
     host: redisHost,
-    port: redisPort
+    port: redisPort,
+    db: redisDatabase.TOKEN
 });
 router.all('*', async (req, res, next) => {
 
@@ -28,12 +29,14 @@ router.all('*', async (req, res, next) => {
     // check params existence
     if (signature === undefined || token === undefined || nonce === undefined) {
         res.sendStatus(401);
+        Logger.Error('Invalid request');
         return;
     }
 
     // check timestamp
     if (Math.abs(Date.now() - timestamp) > 60) {
         res.sendStatus(401);
+        Logger.Error('Timestamp difference too large');
         return;
     }
 
@@ -41,6 +44,7 @@ router.all('*', async (req, res, next) => {
     await db.select(redisDatabase.NONCE);
     if (await db.exists(nonce)) {
         res.sendStatus(401);
+        Logger.Error('Duplicate Request');
         return;
     }
 
@@ -48,16 +52,19 @@ router.all('*', async (req, res, next) => {
     await db.select(redisDatabase.TOKEN);
     if (!await db.exists(token)) {
         res.sendStatus(401);
+        Logger.Error('Identity Token Expired');
         return;
     }
 
-    const {secret} = await db.get(token);
+    const {secret} = JSON.parse(await db.get(token));
+
 
     // check signature
-    const plain = originalUrl + payload + token + timestamp + nonce;
+    const plain = originalUrl + JSON.stringify(payload) + token + timestamp + nonce;
     const hash = crypto.createHash('sha256', secret).update(plain).digest('hex');
     if (hash !== signature) {
         res.sendStatus(401);
+        Logger.Error('Signature Mismatch');
         return;
     }
 

@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.18.0",
     "cookie-parser": "~1.4.3",
     "crypto": "^1.0.1",
     "express": "~4.16.0",
     "ioredis": "^3.2.2",
+    "request": "^2.87.0",
+    "uuid": "^3.3.2",
     "winston": "^3.0.0"
   }
 }
