@@ -56,7 +56,7 @@ router.all('*', async (req, res, next) => {
      * Everything is fine *
      *********************/
 
-    db.set(nonce, true, 'EX', nonceExpireTime);
+    await db.set(nonce, true, 'EX', nonceExpireTime);
 
     return next();
 });
@@ -88,9 +88,9 @@ router.post('/', async (req, res) => {
             await db.select(redisDatabase.TOKEN);
             db.set(token, JSON.stringify({username, secret}), 'EX', tokenExpireTime);
 
+
             // send the token & secret to the client
             res.json({status: 'success', token, secret});
-
             Logger.Info(`User Authenticated: ${username}`);
 
         } else {
