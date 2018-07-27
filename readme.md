@@ -24,7 +24,7 @@ This project is a general solution for the below scenario:
 
 * Use `timestamp` and `nonce` to protect from *reply attack*.
 
-* Use SSL to protect _man-in-the-middle attack_
+* TODO: Use SSL to protect _man-in-the-middle attack_
 
 * Use `SHA-256` to calculate signature to prevent from _brute-force_.
 

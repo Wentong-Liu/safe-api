@@ -41,8 +41,7 @@ router.all('*', async (req, res, next) => {
         Logger.Error('Duplicate Request');
         return;
     }
-
-
+    
     // check signature
     const hash = sign({url, payload, timestamp, nonce});
 
