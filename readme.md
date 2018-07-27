@@ -20,7 +20,7 @@ This project is a general solution for the below scenario:
 
 # Feature
 
-* Use Redis to store identity tokens.
+* Use Redis to cache identity tokens.
 
 * Use `timestamp` and `nonce` with configurable expire time to protect from *reply attack*.
 
@@ -28,6 +28,6 @@ This project is a general solution for the below scenario:
 
 * Use `SHA-256` to calculate signature to prevent from _brute-force_.
 
-* Use HTTP header to pass the identity token and signature for a better compatibility.
+* Use HTTP header to pass the identity token and the signature for a better compatibility.
 
-* Use identity token instead of username to avoid disclose login credentials.
+* Use identity token instead of username to avoid disclosing login credentials.
