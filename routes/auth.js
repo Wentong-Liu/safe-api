@@ -4,7 +4,7 @@ const redis = require("ioredis");
 const crypto = require('crypto');
 const {promisify} = require('util');
 const randomBytesAsync = promisify(crypto.randomBytes);
-const SERVICE_NAME = 'auth.js';
+const SERVICE_NAME = 'API.auth';
 const Logger = require('../utils/logger')(SERVICE_NAME);
 const {redisHost, redisPort, redisDatabase} = require('../config');
 
@@ -39,6 +39,8 @@ router.post('/auth', async (req, res) => {
             // write the relation of token and user to the cache
             db.set(token, {username, secret});
             res.json({status: 'success', token, secret});
+
+            Logger.Info(`User authenticated: ${username}`);
 
         } else {
 
