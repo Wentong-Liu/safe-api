@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const redis = require("ioredis");
-const SERVICE_NAME = 'auth.js';
+const SERVICE_NAME = 'requests.js';
 const Logger = require('../utils/logger')(SERVICE_NAME);
 const sign = require('../utils/sign');
 const {redisHost, redisPort, redisDatabase, tokenExpireTime, nonceExpireTime} = require('../config');
