@@ -65,7 +65,7 @@ router.all('*', async (req, res, next) => {
         // refresh the token expire time & add nonce
         await db.expire(token, tokenExpireTime);
         await db.select(redisDatabase.NONCE);
-        await db.set(nonce, true, 'EX', nonceExpireTime);
+        db.set(nonce, true, 'EX', nonceExpireTime);
 
         return next();
 

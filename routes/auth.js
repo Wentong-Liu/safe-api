@@ -56,7 +56,7 @@ router.all('*', async (req, res, next) => {
          * Everything is fine *
          *********************/
 
-        await db.set(nonce, true, 'EX', nonceExpireTime);
+        db.set(nonce, true, 'EX', nonceExpireTime);
 
         return next();
 
