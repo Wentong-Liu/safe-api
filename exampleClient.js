@@ -1,10 +1,8 @@
-const SERVICE_NAME = 'Client';
-const Logger = require('./utils/logger')(SERVICE_NAME);
 const {port} = require('./config');
 const request = require('request');
 const {promisify} = require('util');
+const sign = require('./utils/sign');
 const rp = promisify(request);
-const crypto = require('crypto');
 const uuidv1 = require('uuid/v1');
 
 /**
@@ -16,20 +14,38 @@ class Client {
     constructor() {
         this.token = null;
         this.secret = null;
+        this.baseURL = `http://localhost:${port}`;
     }
 
+
+
+    /**
+     * Authentication Process
+     * @returns {Promise<void>}
+     */
     async auth() {
 
         const username = 'user';
         const password = 'pass';
 
+        const url = `/api/auth`;
+        const payload = {username, password};
+        const timestamp = Date.now();
+        const nonce = uuidv1();
+
+
+        const signature = sign({url, payload, timestamp, nonce});
+
+
         const options = {
-            url: `http://localhost:${port}/api/auth`,
+            url: this.baseURL + url,
             method: 'POST',
             json: true,
-            body: {username, password},
+            body: payload,
             headers: {
-                'User-Agent': 'request'
+                '_t': timestamp,
+                '_n': nonce,
+                '_s': signature
             }
         };
 
@@ -41,22 +57,24 @@ class Client {
         }
     }
 
+    /**
+     * Make requests
+     * @returns {Promise<void>}
+     */
     async request() {
+
         const message = 'Hello Safe API!';
 
-        const base = `http://localhost:${port}`;
         const url = `/api/v1/request`;
         const payload = {message};
         const token = this.token;
         const timestamp = Date.now();
         const nonce = uuidv1();
 
-
-        const plain = url + JSON.stringify(payload) + token + timestamp + nonce;
-        const signature = crypto.createHash('sha256', this.secret).update(plain).digest('hex');
+        const signature = sign({url, payload, token, timestamp, nonce, secret: this.secret});
 
         const options = {
-            url: base + url,
+            url: this.baseURL + url,
             method: 'POST',
             json: true,
             body: payload,
@@ -70,9 +88,7 @@ class Client {
 
         const {body} = await rp(options);
         console.log(body);
-
     }
-
 }
 
 const client = new Client();

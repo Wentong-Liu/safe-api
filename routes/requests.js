@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const redis = require("ioredis");
-const crypto = require('crypto');
-const {promisify} = require('util');
-const randomBytesAsync = promisify(crypto.randomBytes);
 const SERVICE_NAME = 'auth.js';
 const Logger = require('../utils/logger')(SERVICE_NAME);
+const sign = require('../utils/sign');
 const {redisHost, redisPort, redisDatabase} = require('../config');
 
 const db = new redis({
@@ -13,30 +11,24 @@ const db = new redis({
     port: redisPort,
     db: redisDatabase.TOKEN
 });
+
+
 router.all('*', async (req, res, next) => {
 
     // destruct request parameters
-    const {originalUrl, body: payload, headers: {_u: token, _s: signature, _t: timestamp, _n: nonce}} = req;
-
-    console.log(originalUrl);
-    console.log(payload);
-    console.log(token);
-    console.log(timestamp);
-    console.log(nonce);
-    console.log(signature);
-
+    const {originalUrl: url, body: payload, headers: {_u: token, _s: signature, _t: timestamp, _n: nonce}} = req;
 
     // check params existence
-    if (signature === undefined || token === undefined || nonce === undefined) {
+    if (signature === undefined || token === undefined || nonce === undefined || timestamp === undefined) {
         res.sendStatus(401);
         Logger.Error('Invalid request');
         return;
     }
 
     // check timestamp
-    if (Math.abs(Date.now() - timestamp) > 60) {
+    if (Math.abs(Date.now() - timestamp) > 60000) {
         res.sendStatus(401);
-        Logger.Error('Timestamp difference too large');
+        Logger.Error('Timestamp Difference Too Large');
         return;
     }
 
@@ -60,8 +52,8 @@ router.all('*', async (req, res, next) => {
 
 
     // check signature
-    const plain = originalUrl + JSON.stringify(payload) + token + timestamp + nonce;
-    const hash = crypto.createHash('sha256', secret).update(plain).digest('hex');
+    const hash = sign({url, payload, token, timestamp, nonce, secret});
+
     if (hash !== signature) {
         res.sendStatus(401);
         Logger.Error('Signature Mismatch');
