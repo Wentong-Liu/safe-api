@@ -41,10 +41,9 @@ router.all('*', async (req, res, next) => {
         Logger.Error('Duplicate Request');
         return;
     }
-    
+
     // check signature
     const hash = sign({url, payload, timestamp, nonce});
-
     if (hash !== signature) {
         res.sendStatus(401);
         Logger.Error('Signature Mismatch');

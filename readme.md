@@ -22,9 +22,9 @@ This project is a general solution for the below scenario:
 
 * Use Redis to store identity tokens.
 
-* Use `timestamp` and `nonce` to protect from *reply attack*.
+* Use `timestamp` and `nonce` with configurable expire time to protect from *reply attack*.
 
-* TODO: Use SSL to protect _man-in-the-middle attack_
+* TODO: Use SSL to protect from _man-in-the-middle attack_.
 
 * Use `SHA-256` to calculate signature to prevent from _brute-force_.
 
