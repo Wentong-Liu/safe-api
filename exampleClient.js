@@ -31,9 +31,7 @@ class Client {
         const timestamp = Date.now();
         const nonce = uuid();
 
-
         const signature = sign({url, payload, timestamp, nonce});
-
 
         const options = {
             url: this.baseURL + url,
@@ -89,5 +87,6 @@ class Client {
     }
 }
 
+// make requests
 const client = new Client();
 client.auth().then(() => client.request());
