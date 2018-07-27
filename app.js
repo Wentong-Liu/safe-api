@@ -11,5 +11,4 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/v1', require('./routes/requests'));
 
 
-
 app.listen(port, () => console.log(`Safe API running on port ${port}!`));

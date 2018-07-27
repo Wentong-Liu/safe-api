@@ -3,6 +3,5 @@ module.exports = Object.freeze({
     redisHost: '127.0.0.1',
     redisPort: '6379',
     redisDatabase: {TOKEN: 0, NONCE: 1},
-    apiVersion: 1,
-    predefinedSecret: 'Pre-Negotiated Secret' // for auth process
+    predefinedSecret: 'Pre-Negotiated Secret' // for auth process only
 });

@@ -57,7 +57,7 @@ router.all('*', async (req, res, next) => {
 
 
 /**
- * Authentication
+ * Handle Authentication
  */
 router.post('/', async (req, res) => {
     const {username, password} = req.body;
@@ -81,9 +81,11 @@ router.post('/', async (req, res) => {
             // write the relation of token and user to the cache
             await db.select(redisDatabase.TOKEN);
             db.set(token, JSON.stringify({username, secret}));
+
+            // send the token & secret to the client
             res.json({status: 'success', token, secret});
 
-            Logger.Info(`User authenticated: ${username}`);
+            Logger.Info(`User Authenticated: ${username}`);
 
         } else {
 

@@ -8,8 +8,7 @@ const {redisHost, redisPort, redisDatabase} = require('../config');
 
 const db = new redis({
     host: redisHost,
-    port: redisPort,
-    db: redisDatabase.TOKEN
+    port: redisPort
 });
 
 
@@ -48,8 +47,8 @@ router.all('*', async (req, res, next) => {
         return;
     }
 
+    // get secret
     const {secret} = JSON.parse(await db.get(token));
-
 
     // check signature
     const hash = sign({url, payload, token, timestamp, nonce, secret});
@@ -65,13 +64,15 @@ router.all('*', async (req, res, next) => {
 
 
 /**
- * Example Request @TODO: replace this to real business routes
+ * Example Request that only sends an echo
+ * @TODO: replace this to real business routes
  */
 router.post('/request', async (req, res) => {
     const {message} = req.body;
 
     try {
         res.json({status: 'success', message});
+        Logger.Info(`Message Received: ${message}`);
 
     } catch (e) {
         Logger.Error(e);
