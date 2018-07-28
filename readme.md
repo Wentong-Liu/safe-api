@@ -20,9 +20,11 @@ This project is a general solution for the below scenario:
 
 # Note
 
-For a complete security, you should use SSL whenever possible. 
+* For a complete security, you should use SSL whenever possible. 
 
-In cases that SSL may has been breached or unavailable, the following features are offered:
+* In cases that SSL may has been breached or unavailable, the authentication process is vulnerable and user credentials may be disclosed.
+
+* The following features are offered:
 
 # Feature
 

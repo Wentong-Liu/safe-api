@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const redis = require("ioredis");
-const crypto = require('crypto');
 const {promisify} = require('util');
-const randomBytesAsync = promisify(crypto.randomBytes);
+const {randomBytes} = require('crypto');
+const randomBytesAsync = promisify(randomBytes);
 const SERVICE_NAME = 'API.auth';
 const Logger = require('../utils/logger')(SERVICE_NAME);
 const sign = require('../utils/sign');
@@ -23,7 +23,7 @@ router.all('*', async (req, res, next) => {
         const {originalUrl: url, body: payload, headers: {_s: signature, _t: timestamp, _n: nonce}} = req;
 
         // check params existence
-        if (signature === undefined || nonce === undefined || nonce === timestamp) {
+        if (signature === undefined || nonce === undefined || timestamp === undefined) {
             res.sendStatus(401);
             Logger.Error('Invalid request');
             return;
