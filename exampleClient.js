@@ -83,7 +83,7 @@ class Client {
     }
 
     async logout() {
-        
+
         const url = `/api/v1/logout`;
         const payload = {token: this.token};
 
@@ -100,6 +100,4 @@ class Client {
 
 // make requests
 const client = new Client();
-client.auth().then(() => client.request().then(() => {
-    client.logout()
-}));
+client.auth().then(() => client.request().then(() => client.logout()));
