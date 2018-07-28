@@ -116,8 +116,7 @@ router.post('/', async (req, res) => {
 async function authenticate(username, password) {
     return new Promise((resolve, reject) => {
 
-        // @TODO: your code of checking database
-
+        //@TODO: your code of authenticating
         setTimeout(1, resolve(true))
     });
 }

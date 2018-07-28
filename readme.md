@@ -14,19 +14,23 @@ This project is a general solution for the below scenario:
 
 * `Identity tokens` can have an **expire time** and can be **invalidated manually**.
 
-* Requests need to be **protected from** *brute-force attack*, *reply attack* or *man-in-the-middle* attack.
+* Requests need to be protected from **tempering**, **CSRF attack**, **brute-force attack**, **reply attack** or **man-in-the-middle** attack.
 
 * Requests are passed over `POST` method and payloads are in `JSON` format.
+
+# Note
+
+For a complete security, you should use SSL whenever possible. 
+
+In cases that SSL may has been breached or unavailable, the following features are offered:
 
 # Feature
 
 * Use Redis to cache identity tokens.
 
-* Use `timestamp` and `nonce` with configurable expire time to protect from *reply attack*.
+* use `timestamp` and `nonce` with configurable expire time to protect from *reply attack*.
 
-* TODO: Use SSL to protect from _man-in-the-middle attack_.
-
-* Use `SHA-256` to calculate signature to prevent from _brute-force_.
+* Use `SHA-256` to calculate signature to prevent from _brute-force attack_ and _CSRF attack_.
 
 * Use HTTP header to pass the identity token and the signature for a better compatibility.
 

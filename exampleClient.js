@@ -7,7 +7,7 @@ const {port} = require('./config');
 
 /**
  * Just a simple client showing how to make requests
- * You can use axios for your convenience
+ * You can use axios for your own convenience
  */
 
 class Client {
