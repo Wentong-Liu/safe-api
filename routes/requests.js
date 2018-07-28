@@ -49,7 +49,7 @@ router.all('*', async (req, res, next) => {
         }
 
         // check signature
-        const {secret} = JSON.parse(await db.get(token));
+        const {secret, username} = JSON.parse(await db.get(token));
         const hash = sign({url, payload, token, timestamp, nonce, secret});
 
         if (hash !== signature) {
@@ -67,6 +67,8 @@ router.all('*', async (req, res, next) => {
         await db.select(redisDatabase.NONCE);
         db.set(nonce, true, 'EX', nonceExpireTime);
 
+        // bind username to the request
+        res.locals.user = username;
         return next();
 
     } catch (e) {
@@ -79,13 +81,31 @@ router.all('*', async (req, res, next) => {
  * Example Request that only sends an echo
  * @TODO: replace this to real business routes
  */
-router.post('/request', async (req, res) => {
+router.post('/echo', async (req, res) => {
 
     try {
 
         const {message} = req.body;
         res.json({status: 'success', message});
-        Logger.Info(`Message Received: ${message}`);
+        Logger.Info(`Message Received: ${message} -- from ${res.locals.user}`);
+
+    } catch (e) {
+        Logger.Error(e);
+    }
+});
+
+/**
+ * Logout, remove token from cache
+ */
+router.post('/logout', async (req, res) => {
+
+    try {
+
+        const {token} = req.body;
+        db.del(token);
+
+        res.json({status: 'success'});
+        Logger.Info(`Logged Out: ${res.locals.user} - ${token}`);
 
     } catch (e) {
         Logger.Error(e);
