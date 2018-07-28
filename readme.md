@@ -24,8 +24,6 @@ This project is a general solution for the below scenario:
 
 * In cases that SSL may has been breached or unavailable, the authentication process is vulnerable and user credentials may be disclosed.
 
-* The following features are offered:
-
 # Feature
 
 * Use Redis to cache identity tokens.
