@@ -59,7 +59,7 @@ class Client {
         if (status === 'success') {
             this.token = token;
             this.secret = secret;
-            console.log(`Authenticated: token: ${token}, secret: ${secret}`);
+            console.log(`Authenticated: token: ${token}`);
         }
     }
 
