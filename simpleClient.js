@@ -94,16 +94,13 @@ class Client {
         const payload = {token: this.token};
 
         const {body} = await this.signedRequest(url, payload);
-        const {status, reason} = body;
+        const {status} = body;
 
-        if (status === 'success') {
-            this.token = undefined;
-            this.secret = undefined;
-            console.log(`Logged Out: ${body.status}`);
+        this.token = undefined;
+        this.secret = undefined;
 
-        } else {
-            console.log(`Logged Failed: ${reason}`);
-        }
+        console.log(`Logged Out: ${status}`);
+
     }
 }
 
