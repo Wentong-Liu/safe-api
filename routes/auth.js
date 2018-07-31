@@ -24,31 +24,35 @@ router.all('*', async (req, res, next) => {
 
         // check params existence
         if (signature === undefined || nonce === undefined || timestamp === undefined) {
-            res.sendStatus(401);
-            Logger.Error('Invalid request');
+            const reason = 'Invalid request';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check timestamp
         if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
-            res.sendStatus(401);
-            Logger.Error('Timestamp Difference Too Large');
+            const reason = 'Timestamp Difference Too Large';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check nonce
         await db.select(redisDatabase.NONCE);
         if (await db.exists(nonce)) {
-            res.sendStatus(401);
-            Logger.Error('Duplicate Request');
+            const reason = 'Duplicate Request';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check signature
         const hash = sign({url, payload, timestamp, nonce});
         if (hash !== signature) {
-            res.sendStatus(401);
-            Logger.Error('Signature Mismatch');
+            const reason = 'Signature Mismatch';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
@@ -60,8 +64,9 @@ router.all('*', async (req, res, next) => {
 
         return next();
 
-    } catch (e) {
-        Logger.Error(e);
+    } catch (reason) {
+        res.status(500).json({status: 'error', reason});
+        Logger.Error(reason);
     }
 });
 
@@ -102,8 +107,9 @@ router.post('/', async (req, res) => {
             res.json({status: 'error', reason: 'wrong username or password'});
         }
 
-    } catch (e) {
-        Logger.Error(e);
+    } catch (reason) {
+        res.status(500).json({status: 'error', reason});
+        Logger.Error(reason);
     }
 });
 

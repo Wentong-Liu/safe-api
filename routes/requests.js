@@ -20,31 +20,35 @@ router.all('*', async (req, res, next) => {
 
         // check params existence
         if (signature === undefined || token === undefined || nonce === undefined || timestamp === undefined) {
-            res.sendStatus(401);
-            Logger.Error('Invalid request');
+            const reason = 'Invalid request';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check timestamp
         if (Math.abs(Date.now() - timestamp) > nonceExpireTime * 1000) {
-            res.sendStatus(401);
-            Logger.Error('Timestamp Difference Too Large');
+            const reason = 'Timestamp Difference Too Large';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check nonce
         await db.select(redisDatabase.NONCE);
         if (await db.exists(nonce)) {
-            res.sendStatus(401);
-            Logger.Error('Duplicate Request');
+            const reason = 'Duplicate Request';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
         // check token
         await db.select(redisDatabase.TOKEN);
         if (!await db.exists(token)) {
-            res.sendStatus(401);
-            Logger.Error('Identity Token Expired');
+            const reason = 'Identity Token Expired';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
@@ -53,8 +57,9 @@ router.all('*', async (req, res, next) => {
         const hash = sign({url, payload, token, timestamp, nonce, secret});
 
         if (hash !== signature) {
-            res.sendStatus(401);
-            Logger.Error('Signature Mismatch');
+            const reason = 'Signature Mismatch';
+            res.status(401).json({status: 'error', reason});
+            Logger.Error(reason);
             return;
         }
 
@@ -71,8 +76,9 @@ router.all('*', async (req, res, next) => {
         res.locals.user = username;
         return next();
 
-    } catch (e) {
-        Logger.Error(e);
+    } catch (reason) {
+        res.status(500).json({status: 'error', reason});
+        Logger.Error(reason);
     }
 });
 
@@ -89,8 +95,9 @@ router.post('/echo', async (req, res) => {
         res.json({status: 'success', message});
         Logger.Info(`Message Received: ${message} -- from ${res.locals.user}`);
 
-    } catch (e) {
-        Logger.Error(e);
+    } catch (reason) {
+        res.status(500).json({status: 'error', reason});
+        Logger.Error(reason);
     }
 });
 
@@ -107,8 +114,9 @@ router.post('/logout', async (req, res) => {
         res.json({status: 'success'});
         Logger.Info(`Logged Out: ${res.locals.user} - ${token}`);
 
-    } catch (e) {
-        Logger.Error(e);
+    } catch (reason) {
+        res.status(500).json({status: 'error', reason});
+        Logger.Error(reason);
     }
 });
 

@@ -54,12 +54,15 @@ class Client {
         const payload = {username, password};
 
         const {body} = await this.signedRequest(url, payload);
-        const {status, token, secret} = body;
+        const {status, token, secret, reason} = body;
 
         if (status === 'success') {
             this.token = token;
             this.secret = secret;
             console.log(`Authenticated: token: ${token}`);
+
+        } else {
+            console.log(`Authenticate Failed: ${reason}`);
         }
     }
 
@@ -75,10 +78,13 @@ class Client {
         const payload = {message};
 
         const {body} = await this.signedRequest(url, payload);
-        const {status, message: recv} = body;
+        const {status, message: recv, reason} = body;
 
         if (status === 'success') {
             console.log(`Received: ${recv}`);
+
+        } else {
+            console.log(`Request Failed: ${reason}`);
         }
     }
 
@@ -88,12 +94,15 @@ class Client {
         const payload = {token: this.token};
 
         const {body} = await this.signedRequest(url, payload);
-        const {status} = body;
+        const {status, reason} = body;
 
         if (status === 'success') {
             this.token = undefined;
             this.secret = undefined;
             console.log(`Logged Out: ${body.status}`);
+
+        } else {
+            console.log(`Logged Failed: ${reason}`);
         }
     }
 }
