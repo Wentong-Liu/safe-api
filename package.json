@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "cookie-parser": "~1.4.3",
-    "crypto": "^1.0.1",
     "express": "~4.16.0",
     "ioredis": "^3.2.2",
     "request": "^2.87.0",
